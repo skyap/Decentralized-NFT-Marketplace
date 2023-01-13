@@ -1,5 +1,5 @@
-# Decentralized NFT Marketplace 
-Project demostrates a simply decentralized NFT Marketplace. 
+# Decentralized NFT Marketplace (under development)
+Project demostrates a simply decentralized NFT Marketplace contracts. Dapp will be upload as seperate repository. 
 
 Try running some of the following tasks:
 

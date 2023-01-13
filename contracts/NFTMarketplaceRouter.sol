@@ -9,8 +9,9 @@ interface INFTMarketplaceFactory{
 }
 
 interface Collection{
-    function mintTo(address recipient) external returns (uint256);
-    function createToken(address _to, string memory tokenURI) external returns (uint256);
+    function createToken(string memory _tokenURI,uint256 _price) external returns (bool);
+    function purchaseToken(uint256 _tokenId,address _buyer)external payable returns(bool);
+    function relistToken(uint256 _tokenId,uint256 _price, address _currentOwner)external returns(bool);
     function owner() external view returns (address);
 }
 
@@ -28,7 +29,7 @@ contract NFTMarketplaceRouter is Ownable {
         address collectionAddress;
         uint256 listingFees;
     } 
-    mapping(uint256=>Collection) public collections;
+    mapping(uint256=>CollectionInfo) public collections;
     mapping(address=>uint256[]) public collectionAddressToCollectionId;
 
     uint256 public minListingFees = 1 ether;
@@ -47,8 +48,8 @@ contract NFTMarketplaceRouter is Ownable {
             _name,
             _symbol
         );
-        Collection memory _collection = Collection(
-            msg.sender,
+        CollectionInfo memory _collection = CollectionInfo(
+            payable(msg.sender),
             _collectionAddress,
             _listingFees
         );
@@ -63,14 +64,32 @@ contract NFTMarketplaceRouter is Ownable {
     }
 
 
-    function createToken(uint256 _collectionId,uint256 _sellingPrice)public payable returns(bool){
+    function createToken(uint256 _collectionId,string memory _tokenURI,uint256 _price)public payable returns(bool){
 
-        Collection _collection = Collection(collections[_collectionId].collectionAddress);
-        uint256 _sellingPrice = _collection.getUnMintSellingPrice(_unMintId);
 
-        Collection(collections[_collectionId].collectionAddress).createToken(msg.sender);
+        try Collection(collections[_collectionId].collectionAddress).createToken(_tokenURI,_price){
+            return true;
+        }catch{
+            return false;
+        }
         
-        return true;
+    }
+
+    function purchaseToken(uint256 _collectionId,uint256 _tokenId)public payable returns(bool){
+
+        try Collection(collections[_collectionId].collectionAddress).purchaseToken(_tokenId,msg.sender){
+            return true;
+        }catch{
+            return false;
+        }
+    }
+
+    function relistToken(uint256 _collectionId,uint256 _tokenId,uint256 _price)public returns(bool){
+        try Collection(collections[_collectionId].collectionAddress).relistToken( _tokenId, _price, msg.sender){
+            return true;
+        }catch{
+            return false;
+        }
     }
 
 
