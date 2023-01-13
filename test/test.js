@@ -6,7 +6,7 @@ describe("Router",()=>{
     let factoryContract,routerContract,collectionContract;
     let cowbuy,producer,investor;
     before("Deploy Factory and Router",async()=>{
-        [cowbuy,producer,investor] = await ethers.getSigners();
+        [owner,creator,investor] = await ethers.getSigners();
         // console.log(await producer.getBalance());
         const factory = await ethers.getContractFactory("NFTMarketplaceFactory");
         factoryContract = await factory.connect(cowbuy).deploy();
